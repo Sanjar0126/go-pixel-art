@@ -20,6 +20,14 @@ func ProcessImageToPixelArt(img image.Image, palette []ColorVec, pixelW, pixelH,
 	return processImageToPixelArt(img, palette, pixelW, pixelH, scale)
 }
 
+func LoadImage(path string) (image.Image, error) {
+	return loadImage(path)
+}
+
 func SaveImageAsPNG(img image.Image, path string) error {
 	return saveImageAsPNG(img, path)
+}
+
+func EnsureDir(dir string) error {
+	return ensureDir(dir)
 }

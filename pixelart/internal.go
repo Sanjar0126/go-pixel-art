@@ -39,9 +39,6 @@ func dist2(a, b ColorVec) float64 {
 	return dx*dx + dy*dy + dz*dz
 }
 
-// --- Palette building (kmeans etc.) ---
-// (same functions: kmeans, loadImage, sampleColorsFromImage, buildPaletteFromDir, nearestPaletteColor)
-
 // kmeans runs a simple k-means on colors. Returns centroids.
 func kmeans(samples []ColorVec, k int, maxIter int) []ColorVec {
 	n := len(samples)
