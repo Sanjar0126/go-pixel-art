@@ -13,6 +13,8 @@ import (
 	"path/filepath"
 	"strings"
 	"time"
+
+	"golang.org/x/image/draw"
 )
 
 func clamp(v, lo, hi float64) float64 {
@@ -199,6 +201,35 @@ func nearestPaletteColor(palette []ColorVec, c ColorVec) ColorVec {
 		}
 	}
 	return best
+}
+
+func processImageToPixelArt(img image.Image, palette []ColorVec, pixelW, pixelH, scale int) image.Image {
+	b := img.Bounds()
+	w := b.Dx()
+	h := b.Dy()
+	if pixelH == 0 {
+		ratio := float64(h) / float64(w)
+		pixelH = int(math.Max(1, math.Round(float64(pixelW)*ratio)))
+	}
+
+	pixelImg := image.NewNRGBA(image.Rect(0, 0, pixelW, pixelH))
+	draw.NearestNeighbor.Scale(pixelImg, pixelImg.Bounds(), img, img.Bounds(), draw.Over, nil)
+
+	outPixel := image.NewNRGBA(pixelImg.Bounds())
+	for y := 0; y < pixelH; y++ {
+		for x := 0; x < pixelW; x++ {
+			c := pixelImg.At(x, y)
+			vec := rgbToVec(c)
+			nearest := nearestPaletteColor(palette, vec)
+			outPixel.Set(x, y, nearest.toNRGBA())
+		}
+	}
+
+	upW := pixelW * scale
+	upH := pixelH * scale
+	out := image.NewNRGBA(image.Rect(0, 0, upW, upH))
+	draw.NearestNeighbor.Scale(out, out.Bounds(), outPixel, outPixel.Bounds(), draw.Over, nil)
+	return out
 }
 
 // --- Processing ---
