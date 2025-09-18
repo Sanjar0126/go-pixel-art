@@ -1,80 +1,67 @@
-package cmd
+package main
 
 import (
 	"flag"
 	"fmt"
-	"log"
 	"os"
 	"path/filepath"
-	"strings"
-	"sync"
 
 	"github.com/Sanjar0126/go-pixel-art/pixelart"
 )
 
 func main() {
-	paletteDir := flag.String("paletteDir", "./palette_images", "directory with images used to build the palette")
-	inputDir := flag.String("inputDir", "./input", "directory with images to convert")
-	outDir := flag.String("outDir", "./out", "output directory")
-	paletteSize := flag.Int("paletteSize", 32, "number of colors in palette (k)")
-	samplePerImage := flag.Int("samplePerImage", 500, "how many color samples to take from each palette image")
-	maxPaletteImages := flag.Int("maxPaletteImages", 200, "max number of images to read from paletteDir")
-	pixelW := flag.Int("pixelW", 64, "pixel-art width in pixels")
-	pixelH := flag.Int("pixelH", 0, "pixel-art height in pixels (0 = preserve aspect ratio)")
-	scale := flag.Int("scale", 8, "upscale factor to make pixels visible")
-	workers := flag.Int("workers", 4, "concurrent workers for processing images")
+	inputDir := flag.String("inputDir", "./input", "Input images directory")
+	outDir := flag.String("outDir", "./out", "Output directory")
+	paletteDir := flag.String("paletteDir", "./palette", "Palette directory (for colors or mosaic tiles)")
+	paletteSize := flag.Int("paletteSize", 32, "Palette size for pixel mode")
+	pixelW := flag.Int("pixelW", 64, "Pixel width")
+	scale := flag.Int("scale", 8, "Upscale factor")
+	tileSize := flag.Int("tileSize", 16, "Mosaic tile size")
+	mosaicMode := flag.Bool("mosaic", false, "Use mosaic mode instead of flat pixel mode")
 	flag.Parse()
 
-	fmt.Println("Building palette from", *paletteDir)
-	palette, err := pixelart.BuildPaletteFromDir(*paletteDir, *paletteSize, *samplePerImage, *maxPaletteImages)
-	if err != nil {
-		log.Fatalf("failed to build palette: %v", err)
-	}
-	fmt.Printf("Palette built: %d colors\n", len(palette))
+	os.MkdirAll(*outDir, 0755)
 
-	if err := pixelart.EnsureDir(*outDir); err != nil {
-		log.Fatalf("failed to create outDir: %v", err)
-	}
-
-	inputPaths := []string{}
-	filepath.Walk(*inputDir, func(path string, info os.FileInfo, err error) error {
-		if err == nil && !info.IsDir() {
-			ext := strings.ToLower(filepath.Ext(path))
-			if ext == ".png" || ext == ".jpg" || ext == ".jpeg" || ext == ".gif" || ext == ".webp" {
-				inputPaths = append(inputPaths, path)
-			}
+	if *mosaicMode {
+		tiles, err := pixelart.LoadMosaicTiles(*paletteDir, *tileSize)
+		if err != nil {
+			panic(err)
 		}
-		return nil
-	})
-
-	tasks := make(chan string, len(inputPaths))
-	var wg sync.WaitGroup
-	for i := 0; i < *workers; i++ {
-		wg.Add(1)
-		go func(id int) {
-			defer wg.Done()
-			for p := range tasks {
-				fmt.Printf("worker %d processing %s\n", id, p)
-				img, err := pixelart.LoadImage(p)
-				if err != nil {
-					log.Printf("failed load %s: %v", p, err)
-					continue
-				}
-				outImg := pixelart.ProcessImageToPixelArt(img, palette, *pixelW, *pixelH, *scale)
-				rel, _ := filepath.Rel(*inputDir, p)
-				outPath := filepath.Join(*outDir, strings.TrimSuffix(rel, filepath.Ext(rel))+"_pixel.png")
-				pixelart.EnsureDir(filepath.Dir(outPath))
-				if err := pixelart.SaveImageAsPNG(outImg, outPath); err != nil {
-					log.Printf("save error for %s: %v", outPath, err)
-				}
+		filepath.Walk(*inputDir, func(path string, info os.FileInfo, err error) error {
+			if err != nil || info.IsDir() {
+				return nil
 			}
-		}(i)
+			img, err := pixelart.LoadImage(path)
+			if err != nil {
+				return nil
+			}
+			out, err := pixelart.BuildMosaic(img, tiles, *pixelW, *pixelW, *tileSize)
+			if err != nil {
+				return err
+			}
+			outPath := filepath.Join(*outDir, info.Name())
+			pixelart.SaveImageAsPNG(out, outPath)
+			fmt.Println("Saved:", outPath)
+			return nil
+		})
+	} else {
+		palette, err := pixelart.BuildPaletteFromDir(*paletteDir, *paletteSize, 500, 200)
+		if err != nil {
+			panic(err)
+		}
+		filepath.Walk(*inputDir, func(path string, info os.FileInfo, err error) error {
+			if err != nil || info.IsDir() {
+				return nil
+			}
+			img, err := pixelart.LoadImage(path)
+			if err != nil {
+				return nil
+			}
+			out := pixelart.ProcessImageToPixelArt(img, palette, *pixelW, 0, *scale)
+			outPath := filepath.Join(*outDir, info.Name())
+			pixelart.SaveImageAsPNG(out, outPath)
+			fmt.Println("Saved:", outPath)
+			return nil
+		})
 	}
-	for _, p := range inputPaths {
-		tasks <- p
-	}
-	close(tasks)
-	wg.Wait()
-
-	fmt.Println("Done. Output in", *outDir)
 }
