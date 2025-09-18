@@ -188,6 +188,19 @@ func buildPaletteFromDir(dir string, paletteSize int, samplePerImage int, maxIma
 	return centroids, nil
 }
 
+func nearestPaletteColor(palette []ColorVec, c ColorVec) ColorVec {
+	best := palette[0]
+	bestD := dist2(best, c)
+	for i := 1; i < len(palette); i++ {
+		d := dist2(palette[i], c)
+		if d < bestD {
+			bestD = d
+			best = palette[i]
+		}
+	}
+	return best
+}
+
 // --- Processing ---
 // (same function: processImageToPixelArt)
 
