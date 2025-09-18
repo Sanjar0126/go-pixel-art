@@ -47,9 +47,9 @@ func kmeans(samples []ColorVec, k int, maxIter int) []ColorVec {
 		return cent
 	}
 
-	rand.Seed(time.Now().UnixNano())
+	rng := rand.New(rand.NewSource(time.Now().UnixNano()))
 	centroids := make([]ColorVec, k)
-	perm := rand.Perm(n)
+	perm := rng.Perm(n)
 	for i := 0; i < k; i++ {
 		centroids[i] = samples[perm[i]]
 	}
@@ -97,7 +97,7 @@ func kmeans(samples []ColorVec, k int, maxIter int) []ColorVec {
 				centroids[j][2] /= float64(counts[j])
 			} else {
 				// empty cluster: reinitialize to random sample
-				centroids[j] = samples[rand.Intn(n)]
+				centroids[j] = samples[rng.Intn(n)]
 			}
 		}
 	}
