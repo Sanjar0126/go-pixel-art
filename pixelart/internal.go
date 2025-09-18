@@ -36,4 +36,21 @@ func dist2(a, b ColorVec) float64 {
 // --- Processing ---
 // (same function: processImageToPixelArt)
 
+// --- Saving ---
+func saveImageAsPNG(img image.Image, path string) error {
+	f, err := os.Create(path)
+	if err != nil {
+		return err
+	}
+	defer f.Close()
+	w := bufio.NewWriter(f)
+	err = png.Encode(w, img)
+	if err != nil {
+		return err
+	}
+	return w.Flush()
+}
 
+func ensureDir(dir string) error {
+	return os.MkdirAll(dir, 0755)
+}
