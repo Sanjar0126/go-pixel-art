@@ -5,6 +5,7 @@ import (
 	"image"
 	"image/color"
 	"image/png"
+	"math"
 	"math/rand"
 	"os"
 	"time"
@@ -113,6 +114,30 @@ func loadImage(path string) (image.Image, error) {
 
 	img, _, err := image.Decode(f)
 	return img, err
+}
+
+func sampleColorsFromImage(img image.Image, maxSamples int) []ColorVec {
+	b := img.Bounds()
+	w := b.Dx()
+	h := b.Dy()
+	if maxSamples <= 0 {
+		maxSamples = w * h
+	}
+	step := int(math.Ceil(math.Sqrt(float64(w*h) / float64(maxSamples))))
+	if step < 1 {
+		step = 1
+	}
+	out := make([]ColorVec, 0, maxSamples)
+	for y := b.Min.Y; y < b.Max.Y; y += step {
+		for x := b.Min.X; x < b.Max.X; x += step {
+			c := img.At(x, y)
+			out = append(out, rgbToVec(c))
+			if len(out) >= maxSamples {
+				return out
+			}
+		}
+	}
+	return out
 }
 
 // --- Processing ---
