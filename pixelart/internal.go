@@ -2,12 +2,16 @@ package pixelart
 
 import (
 	"bufio"
+	"fmt"
 	"image"
 	"image/color"
 	"image/png"
+	"log"
 	"math"
 	"math/rand"
 	"os"
+	"path/filepath"
+	"strings"
 	"time"
 )
 
@@ -138,6 +142,50 @@ func sampleColorsFromImage(img image.Image, maxSamples int) []ColorVec {
 		}
 	}
 	return out
+}
+
+func buildPaletteFromDir(dir string, paletteSize int, samplePerImage int, maxImages int) ([]ColorVec, error) {
+	paths := []string{}
+	err := filepath.Walk(dir, func(path string, info os.FileInfo, err error) error {
+		if err != nil {
+			return nil
+		}
+		if info.IsDir() {
+			return nil
+		}
+		ext := strings.ToLower(filepath.Ext(path))
+		if ext == ".png" || ext == ".jpg" || ext == ".jpeg" || ext == ".gif" || ext == ".webp" {
+			paths = append(paths, path)
+		}
+		return nil
+	})
+	if err != nil {
+		return nil, err
+	}
+	if len(paths) == 0 {
+		return nil, fmt.Errorf("no images found in paletteDir %s", dir)
+	}
+	if maxImages > 0 && len(paths) > maxImages {
+		paths = paths[:maxImages]
+	}
+
+	samples := make([]ColorVec, 0, len(paths)*samplePerImage)
+	for _, p := range paths {
+		img, err := loadImage(p)
+		if err != nil {
+			log.Printf("failed to load %s: %v", p, err)
+			continue
+		}
+		s := sampleColorsFromImage(img, samplePerImage)
+		samples = append(samples, s...)
+	}
+
+	if len(samples) == 0 {
+		return nil, fmt.Errorf("no color samples collected")
+	}
+
+	centroids := kmeans(samples, paletteSize, 40)
+	return centroids, nil
 }
 
 // --- Processing ---
