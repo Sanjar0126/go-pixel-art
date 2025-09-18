@@ -5,7 +5,9 @@ import (
 	"image"
 	"image/color"
 	"image/png"
+	"math/rand"
 	"os"
+	"time"
 )
 
 func clamp(v, lo, hi float64) float64 {
@@ -32,6 +34,75 @@ func dist2(a, b ColorVec) float64 {
 
 // --- Palette building (kmeans etc.) ---
 // (same functions: kmeans, loadImage, sampleColorsFromImage, buildPaletteFromDir, nearestPaletteColor)
+
+// kmeans runs a simple k-means on colors. Returns centroids.
+func kmeans(samples []ColorVec, k int, maxIter int) []ColorVec {
+	n := len(samples)
+	if n == 0 || k <= 0 {
+		return nil
+	}
+	if k >= n {
+		cent := make([]ColorVec, k)
+		copy(cent, samples)
+		return cent
+	}
+
+	rand.Seed(time.Now().UnixNano())
+	centroids := make([]ColorVec, k)
+	perm := rand.Perm(n)
+	for i := 0; i < k; i++ {
+		centroids[i] = samples[perm[i]]
+	}
+
+	labels := make([]int, n)
+	counts := make([]int, k)
+	for iter := 0; iter < maxIter; iter++ {
+		changed := false
+
+		for i, s := range samples {
+			best := 0
+			bestD := dist2(s, centroids[0])
+			for j := 1; j < k; j++ {
+				d := dist2(s, centroids[j])
+				if d < bestD {
+					bestD = d
+					best = j
+				}
+			}
+			if labels[i] != best {
+				changed = true
+				labels[i] = best
+			}
+		}
+		if !changed && iter > 0 {
+			break
+		}
+
+		// recompute centroids
+		for j := 0; j < k; j++ {
+			counts[j] = 0
+			centroids[j] = ColorVec{0, 0, 0}
+		}
+		for i, s := range samples {
+			l := labels[i]
+			centroids[l][0] += s[0]
+			centroids[l][1] += s[1]
+			centroids[l][2] += s[2]
+			counts[l]++
+		}
+		for j := 0; j < k; j++ {
+			if counts[j] > 0 {
+				centroids[j][0] /= float64(counts[j])
+				centroids[j][1] /= float64(counts[j])
+				centroids[j][2] /= float64(counts[j])
+			} else {
+				// empty cluster: reinitialize to random sample
+				centroids[j] = samples[rand.Intn(n)]
+			}
+		}
+	}
+	return centroids
+}
 
 // --- Processing ---
 // (same function: processImageToPixelArt)
