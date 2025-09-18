@@ -104,6 +104,17 @@ func kmeans(samples []ColorVec, k int, maxIter int) []ColorVec {
 	return centroids
 }
 
+func loadImage(path string) (image.Image, error) {
+	f, err := os.Open(path)
+	if err != nil {
+		return nil, err
+	}
+	defer f.Close()
+
+	img, _, err := image.Decode(f)
+	return img, err
+}
+
 // --- Processing ---
 // (same function: processImageToPixelArt)
 
