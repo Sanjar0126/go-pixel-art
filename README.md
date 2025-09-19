@@ -42,12 +42,12 @@ Now you can run the CLI with ./pixelart.
 ```
 Flags
 | Flag        | Description                                                                          | Default                 |
-| -------- | ------------------------------------------------------------------------------------ | ----------------------- |
+| ----------- | ------------------------------------------------------------------------------------ | ----------------------- |
 | `-in`       | Input image file path                                                                | required                |
 | `-out`      | Output image file path                                                               | required                |
 | `-width`    | Grid width in blocks                                                                 | 64                      |
 | `-height`   | Grid height in blocks                                                                | 64                      |
-| `-tileSize` | Tile size (for mosaic mode, e.g. 16 = 16x16 per block)                          | 16                      |
+| `-tileSize` | Tile size (for mosaic mode, e.g. 16 = 16x16 per block)                               | 16                      |
 | `-palette`  | Path to palette directory (images for mosaic mode, or JSON of colors for pixel mode) | required in mosaic mode |
 | `-mosaic`   | Use mosaic mode (otherwise defaults to pixel art mode)                               | false                   |
 
