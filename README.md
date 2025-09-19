@@ -26,8 +26,8 @@ Supports **variable tile sizes** and can be used both as a **CLI tool** and as a
 Clone the repository and build:
 
 ```bash
-git clone https://github.com/yourusername/pixelart.git
-cd pixelart/cmd/pixelart
+git clone https://github.com/Sanjar0126/go-pixel-art.git
+cd go-pixel-art/cmd
 go build -o pixelart
 ```
 
