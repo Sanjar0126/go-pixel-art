@@ -73,12 +73,12 @@ func main() {
 
     // Example: Pixel Art Mode
     palette := []color.Color{color.Black, color.White, color.RGBA{255,0,0,255}}
-    pix, _ := pixelart.Pixelate(img, palette, 64, 64)
+    pix, _ := pixelart.ProcessImageToPixelArt(img, palette, 64, 64, 8)
     pixelart.SaveImage("pixel_output.png", pix)
 
     // Example: Mosaic Mode
     tiles, _ := pixelart.LoadMosaicTiles("./palette", 16)
-    mosaic, _ := pixelart.BuildMosaic(img, tiles, 64, 64, 16)
+    mosaic, _ := pixelart.BuildMosaic(img, tiles, 64, 64, 8)
     pixelart.SaveImage("mosaic_output.png", mosaic)
 }
 ```

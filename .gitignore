@@ -34,3 +34,5 @@ go.work.sum
 palette_images
 input
 out
+
+build
