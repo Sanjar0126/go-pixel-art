@@ -60,9 +60,9 @@ images through `-paletteDir`:
 | `-paletteDir`  | Directory containing palette or mosaic tile images | `./palette`|
 | `-paletteSize` | Number of colors to build for pixel art mode       | `32`       |
 | `-pixelW`      | Width of the pixel grid                            | `64`       |
-| `-scale`       | Upscale factor for pixel art mode                 | `8`        |
-| `-tileSize`    | Width and height of each mosaic tile              | `16`       |
-| `-mosaic`      | Use mosaic mode instead of flat pixel art mode    | `false`    |
+| `-scale`       | Upscale factor for pixel art mode                  | `8`        |
+| `-tileSize`    | Width and height of each mosaic tile               | `16`       |
+| `-mosaic`      | Use mosaic mode instead of flat pixel art mode     | `false`    |
 
 ---
 
