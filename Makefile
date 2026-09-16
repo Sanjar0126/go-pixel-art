@@ -1,11 +1,13 @@
 GO := go
 BINARY := pixelart
 CMD := ./cmd
-DIST_DIR := dist
+BUILD_DIR := build
 GOOS ?= $(shell $(GO) env GOOS)
 GOARCH ?= $(shell $(GO) env GOARCH)
 EXT := $(if $(filter windows,$(GOOS)),.exe,)
-OUTPUT := $(DIST_DIR)/$(BINARY)-$(GOOS)-$(GOARCH)$(EXT)
+OUTPUT := $(BUILD_DIR)/$(BINARY)-$(GOOS)-$(GOARCH)$(EXT)
+BUILD_TARGETS := build-linux-amd64 build-linux-arm64 build-darwin-amd64 \
+	build-darwin-arm64 build-windows-amd64
 
 .PHONY: all build build-all build-linux-amd64 build-linux-arm64 \
 	build-darwin-amd64 build-darwin-arm64 build-windows-amd64 test clean
@@ -13,11 +15,22 @@ OUTPUT := $(DIST_DIR)/$(BINARY)-$(GOOS)-$(GOARCH)$(EXT)
 all: build
 
 build:
-	mkdir -p $(DIST_DIR)
+	mkdir -p $(BUILD_DIR)
 	GOOS=$(GOOS) GOARCH=$(GOARCH) $(GO) build -o $(OUTPUT) $(CMD)
 
-build-all: build-linux-amd64 build-linux-arm64 build-darwin-amd64 \
-	build-darwin-arm64 build-windows-amd64
+build-all:
+	@failed=0; \
+	for target in $(BUILD_TARGETS); do \
+		echo "==> $$target"; \
+		if ! $(MAKE) $$target; then \
+			echo "WARNING: $$target failed; continuing"; \
+			failed=1; \
+		fi; \
+	done; \
+	if [ $$failed -ne 0 ]; then \
+		echo "Some builds failed."; \
+		exit 1; \
+	fi
 
 build-linux-amd64:
 	$(MAKE) build GOOS=linux GOARCH=amd64
@@ -38,4 +51,4 @@ test:
 	$(GO) test ./...
 
 clean:
-	rm -rf $(DIST_DIR)
+	rm -rf $(BUILD_DIR)

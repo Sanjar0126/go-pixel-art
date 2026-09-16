@@ -31,7 +31,7 @@ cd go-pixel-art
 make build
 ```
 
-The binary is written to `dist/pixelart-<os>-<arch>`.
+The binary is written to `build/pixelart-<os>-<arch>`.
 
 ### Cross-Platform Builds
 
@@ -42,7 +42,10 @@ make build-all
 ```
 
 This creates binaries for Linux (`amd64`, `arm64`), macOS (`amd64`, `arm64`),
-and Windows (`amd64`) in `dist/`. Build one target with a named Make target:
+and Windows (`amd64`) in `build/`. Build one target with a named Make target:
+
+`make build-all` attempts every target even when one build fails. It returns a
+nonzero status at the end if any target failed.
 
 ```bash
 make build-linux-amd64
