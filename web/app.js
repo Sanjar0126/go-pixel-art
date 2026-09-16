@@ -7,12 +7,18 @@ const result = document.querySelector('#result');
 const download = document.querySelector('#download');
 const paletteInput = document.querySelector('#palette-input');
 const paletteName = document.querySelector('#palette-name');
+const mosaicInput = document.querySelector('#mosaic');
+const paletteSizeField = document.querySelector('#palette-size-field');
 
 let selectedFile;
 let originalURL;
 let resultURL;
 let paletteFiles = [];
 let bundledPalettePromise;
+
+function updateOptionVisibility() {
+  paletteSizeField.hidden = mosaicInput.checked;
+}
 
 async function startWasm() {
   const go = new Go();
@@ -49,6 +55,9 @@ paletteInput.addEventListener('change', () => {
     : 'Required for mosaic mode';
 });
 
+mosaicInput.addEventListener('change', updateOptionVisibility);
+updateOptionVisibility();
+
 async function loadBundledPalette() {
   if (!bundledPalettePromise) {
     bundledPalettePromise = fetch('palette.json')
@@ -71,7 +80,7 @@ processButton.addEventListener('click', async () => {
       pixelWidth: Number(document.querySelector('#pixel-width').value),
       scale: Number(document.querySelector('#scale').value),
       tileSize: Number(document.querySelector('#tile-size').value),
-      mosaic: document.querySelector('#mosaic').checked,
+      mosaic: mosaicInput.checked,
       paletteSize: Number(document.querySelector('#palette-size').value),
     };
     let paletteSources = paletteFiles;

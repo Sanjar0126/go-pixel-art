@@ -22,10 +22,10 @@
           <input id="image-input" type="file" accept="image/png,image/jpeg,image/webp,image/gif">
         </label>
         <div class="fields">
-          <label>Pixel width <input id="pixel-width" type="number" min="0" max="2048" value="0"></label>
-          <label>Scale <input id="scale" type="number" min="1" max="32" value="8"></label>
-          <label>Tile size <input id="tile-size" type="number" min="1" max="128" value="16"></label>
-          <label>Palette size <input id="palette-size" type="number" min="1" max="256" value="8"></label>
+          <label>Pixel width <span class="hint">0 keeps source dimensions</span><input id="pixel-width" type="number" min="0" max="2048" value="0"></label>
+          <label>Scale <span class="hint">Output enlargement factor</span><input id="scale" type="number" min="1" max="32" value="8"></label>
+          <label>Tile size <span class="hint">Mosaic tile width and height</span><input id="tile-size" type="number" min="1" max="128" value="16"></label>
+          <label id="palette-size-field">Palette size <span class="hint">Color palette limit in pixel mode</span><input id="palette-size" type="number" min="1" max="256" value="8"></label>
         </div>
         <label class="mode"> <input id="mosaic" type="checkbox"> Mosaic mode</label>
         <label class="dropzone compact" for="palette-input">
