@@ -65,6 +65,32 @@ Run the test suite with:
 make test
 ```
 
+### Browser Build
+
+The repository also includes a browser version powered by Go WebAssembly. It
+accepts PNG, JPEG, GIF, and WebP uploads, then produces a downloadable PNG.
+The browser UI exposes pixel width, scale, tile size, palette size, and mosaic
+mode. In mosaic mode, upload the palette tile images with the `Palette tiles`
+control, or place PNG tiles in `web/palette/`; `make build-web` generates a
+manifest so the bundled palette is loaded automatically. Browser code cannot
+read an arbitrary local `paletteDir` path directly.
+Build it with:
+
+```bash
+make build-web
+```
+
+This writes `app.wasm` and `wasm_exec.js` into `web/`. Serve that directory
+over HTTP, because browsers do not load WebAssembly correctly from `file://`:
+
+```bash
+cd web
+python3 -m http.server 8000
+```
+
+Open <http://localhost:8000>. The contents of `web/` can be deployed directly
+to GitHub Pages.
+
 ---
 
 ## CLI Usage
@@ -83,6 +109,20 @@ images through `-paletteDir`:
 ./pixelart -inputDir ./input -outDir ./out -paletteDir ./tiles -mosaic
 ```
 
+`-paletteDir` is read from the local filesystem. In mosaic mode, every valid
+image in that directory becomes a tile. `-pixelW` is the number of grid cells,
+while `-tileSize` is the size of each output tile. For example, a 512x512
+output made from 16x16 tiles uses 32 grid cells:
+
+```bash
+./pixelart -inputDir input -outDir output -pixelW 32 -tileSize 16 \
+    -mosaic -paletteDir minecraft-palette
+```
+
+Using `-pixelW 512 -tileSize 16` creates an 8192x8192 output. In pixel mode,
+`-paletteDir` is currently reserved for the palette builder; the current demo
+palette uses four fixed colors.
+
 ### Flags
 
 | Flag           | Description                                        | Default    |
@@ -91,7 +131,7 @@ images through `-paletteDir`:
 | `-outDir`      | Directory where generated images are written       | `./out`    |
 | `-paletteDir`  | Directory containing palette or mosaic tile images | `./palette`|
 | `-paletteSize` | Number of colors to build for pixel art mode       | `32`       |
-| `-pixelW`      | Width of the pixel grid                            | `64`       |
+| `-pixelW`      | Pixel-grid width; `0` preserves the source dimensions | `0`      |
 | `-scale`       | Upscale factor for pixel art mode                  | `8`        |
 | `-tileSize`    | Width and height of each mosaic tile               | `16`       |
 | `-mosaic`      | Use mosaic mode instead of flat pixel art mode     | `false`    |
