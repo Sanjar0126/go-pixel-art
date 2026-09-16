@@ -5,6 +5,7 @@ import (
 	"log"
 	"os"
 	"path/filepath"
+	"strings"
 
 	"github.com/Sanjar0126/go-pixel-art/pixelart"
 )
@@ -42,8 +43,13 @@ func main() {
 			if err != nil {
 				return err
 			}
-			outPath := filepath.Join(*outDir, info.Name())
-			err = pixelart.SaveImageAsPNG(out, outPath)
+			outExt := strings.ToLower(filepath.Ext(info.Name()))
+			if outExt != ".webp" {
+				outExt = ".png"
+			}
+			outName := strings.TrimSuffix(info.Name(), filepath.Ext(info.Name())) + outExt
+			outPath := filepath.Join(*outDir, outName)
+			err = pixelart.SaveImage(out, outPath)
 			if err != nil {
 				return err
 			}
@@ -67,8 +73,13 @@ func main() {
 				return nil
 			}
 			out := pixelart.ProcessImageToPixelArt(img, palette, *pixelW, 0, *scale)
-			outPath := filepath.Join(*outDir, info.Name())
-			err = pixelart.SaveImageAsPNG(out, outPath)
+			outExt := strings.ToLower(filepath.Ext(info.Name()))
+			if outExt != ".webp" {
+				outExt = ".png"
+			}
+			outName := strings.TrimSuffix(info.Name(), filepath.Ext(info.Name())) + outExt
+			outPath := filepath.Join(*outDir, outName)
+			err = pixelart.SaveImage(out, outPath)
 			if err != nil {
 				return err
 			}
