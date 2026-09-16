@@ -62,7 +62,10 @@ func BuildMosaic(src image.Image, tiles []MosaicTile, gridW, gridH, tileSize int
 			r := image.Rect(x*tileSize, y*tileSize, (x+1)*tileSize, (y+1)*tileSize)
 			draw.Draw(out, r, tile.Img, image.Point{}, draw.Over)
 
-			bar.Add(1)
+			err := bar.Add(1)
+			if err != nil {
+				return nil, err
+			}
 		}
 	}
 	return out, nil
