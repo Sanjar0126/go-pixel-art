@@ -31,10 +31,7 @@ go.work.sum
 # .idea/
 # .vscode/
 
-
-palette*
 input
 out
 
 build
-web/palette/
