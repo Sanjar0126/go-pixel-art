@@ -55,8 +55,8 @@ func BuildMosaic(src image.Image, tiles []MosaicTile, gridW, gridH, tileSize int
 	total := gridW * gridH
 	bar := progressbar.Default(int64(total))
 
-	for y := 0; y < gridH; y++ {
-		for x := 0; x < gridW; x++ {
+	for y := range gridH {
+		for x := range gridW {
 			c := small.At(x, y)
 			tile := closestTile(c, tiles)
 			r := image.Rect(x*tileSize, y*tileSize, (x+1)*tileSize, (y+1)*tileSize)
