@@ -35,21 +35,34 @@ Now you can run the CLI with ./pixelart.
 
 ---
 
-## Cli Usage
+## CLI Usage
+
+The CLI processes every image in the input directory and writes the results to
+the output directory. By default, it uses pixel art mode:
 
 ```bash
-./pixelart -in input.jpg -out output.png -width 64 -height 64 -tileSize 16 -palette ./palette -mosaic
+./pixelart -inputDir ./input -outDir ./out -paletteDir ./palette
 ```
-Flags
-| Flag        | Description                                                                          | Default                 |
-| ----------- | ------------------------------------------------------------------------------------ | ----------------------- |
-| `-in`       | Input image file path                                                                | required                |
-| `-out`      | Output image file path                                                               | required                |
-| `-width`    | Grid width in blocks                                                                 | 64                      |
-| `-height`   | Grid height in blocks                                                                | 64                      |
-| `-tileSize` | Tile size (for mosaic mode, e.g. 16 = 16x16 per block)                               | 16                      |
-| `-palette`  | Path to palette directory (images for mosaic mode, or JSON of colors for pixel mode) | required in mosaic mode |
-| `-mosaic`   | Use mosaic mode (otherwise defaults to pixel art mode)                               | false                   |
+
+To generate a mosaic instead, add `-mosaic` and provide a directory of tile
+images through `-paletteDir`:
+
+```bash
+./pixelart -inputDir ./input -outDir ./out -paletteDir ./tiles -mosaic
+```
+
+### Flags
+
+| Flag           | Description                                        | Default    |
+| -------------- | -------------------------------------------------- | ---------- |
+| `-inputDir`    | Directory containing input images                  | `./input`  |
+| `-outDir`      | Directory where generated images are written       | `./out`    |
+| `-paletteDir`  | Directory containing palette or mosaic tile images | `./palette`|
+| `-paletteSize` | Number of colors to build for pixel art mode       | `32`       |
+| `-pixelW`      | Width of the pixel grid                            | `64`       |
+| `-scale`       | Upscale factor for pixel art mode                 | `8`        |
+| `-tileSize`    | Width and height of each mosaic tile              | `16`       |
+| `-mosaic`      | Use mosaic mode instead of flat pixel art mode    | `false`    |
 
 ---
 
