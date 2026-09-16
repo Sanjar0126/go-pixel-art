@@ -15,7 +15,7 @@ func main() {
 	outDir := flag.String("outDir", "./out", "Output directory")
 	paletteDir := flag.String("paletteDir", "./palette", "Palette directory (for colors or mosaic tiles)")
 	paletteSize := flag.Int("paletteSize", 32, "Palette size for pixel mode")
-	pixelW := flag.Int("pixelW", 64, "Pixel width")
+	pixelW := flag.Int("pixelW", 0, "Pixel width (0 uses the source image size)")
 	scale := flag.Int("scale", 8, "Upscale factor")
 	tileSize := flag.Int("tileSize", 16, "Mosaic tile size")
 	mosaicMode := flag.Bool("mosaic", false, "Use mosaic mode instead of flat pixel mode")
@@ -39,7 +39,11 @@ func main() {
 			if err != nil {
 				return nil
 			}
-			out, err := pixelart.BuildMosaic(img, tiles, *pixelW, *pixelW, *tileSize)
+			gridW, gridH := *pixelW, *pixelW
+			if *pixelW <= 0 {
+				gridW, gridH = img.Bounds().Dx(), img.Bounds().Dy()
+			}
+			out, err := pixelart.BuildMosaic(img, tiles, gridW, gridH, *tileSize)
 			if err != nil {
 				return err
 			}
@@ -72,7 +76,11 @@ func main() {
 			if err != nil {
 				return nil
 			}
-			out := pixelart.ProcessImageToPixelArt(img, palette, *pixelW, 0, *scale)
+			pixelWidth, pixelHeight := *pixelW, 0
+			if *pixelW <= 0 {
+				pixelWidth, pixelHeight = img.Bounds().Dx(), img.Bounds().Dy()
+			}
+			out := pixelart.ProcessImageToPixelArt(img, palette, pixelWidth, pixelHeight, *scale)
 			outExt := strings.ToLower(filepath.Ext(info.Name()))
 			if outExt != ".webp" {
 				outExt = ".png"
