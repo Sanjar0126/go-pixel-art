@@ -23,15 +23,44 @@ Supports **variable tile sizes** and can be used both as a **CLI tool** and as a
 
 ## Installation
 
-Clone the repository and build:
+Clone the repository and build the native binary with Make:
 
 ```bash
 git clone https://github.com/Sanjar0126/go-pixel-art.git
-cd go-pixel-art/cmd
-go build -o pixelart
+cd go-pixel-art
+make build
 ```
 
-Now you can run the CLI with ./pixelart.
+The binary is written to `dist/pixelart-<os>-<arch>`.
+
+### Cross-Platform Builds
+
+Build all supported release targets:
+
+```bash
+make build-all
+```
+
+This creates binaries for Linux (`amd64`, `arm64`), macOS (`amd64`, `arm64`),
+and Windows (`amd64`) in `dist/`. Build one target with a named Make target:
+
+```bash
+make build-linux-amd64
+make build-darwin-arm64
+make build-windows-amd64
+```
+
+You can also choose any Go-supported target directly:
+
+```bash
+make build GOOS=freebsd GOARCH=amd64
+```
+
+Run the test suite with:
+
+```bash
+make test
+```
 
 ---
 
