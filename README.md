@@ -138,6 +138,38 @@ palette uses four fixed colors.
 
 ---
 
+## Minecraft World Generator
+
+`cmd/mcworld` turns an image into a real Minecraft Java Edition world save: it
+matches each pixel to the nearest-color block texture (from `web/minecraft-icons`
+by default) and places one block per pixel on a flat ground layer.
+
+```bash
+make build-mcworld
+./build/mcworld-linux-amd64 -image ./input/photo.png -outDir ./out/mcworld
+```
+
+Copy the resulting `out/mcworld` folder into your Minecraft `saves/` directory
+to open it. The world targets Minecraft **1.16.5** (DataVersion 2586) and has
+not been verified by loading it in a real client — treat it as best-effort and
+report load issues.
+
+| Flag         | Description                                                    | Default                 |
+| ------------ | ---------------------------------------------------------------| ------------------------|
+| `-image`     | Input image to render as a block mosaic (required)             | —                        |
+| `-iconsDir`  | Directory of block texture PNGs used to build the palette      | `./web/minecraft-icons`  |
+| `-outDir`    | Output world save directory                                    | `./out/mcworld`          |
+| `-worldName` | World name stored in `level.dat`                                | `Pixel Art World`        |
+| `-groundY`   | Y level (0-255) of the flat mosaic ground layer                | `64`                     |
+| `-maxWidth`  | Maximum mosaic width in blocks (image is downscaled to fit)     | `256`                    |
+| `-maxHeight` | Maximum mosaic height in blocks (image is downscaled to fit)    | `256`                    |
+
+Block texture filtering (which files in `-iconsDir` count as placeable
+blocks vs. icons/GUI art) is heuristic — see `nonBlockKeywords` in
+`pixelart/mcworld/blocks.go` if you need to tune it.
+
+---
+
 ## Library Usage
 
 You can also import and use this as a Go package:

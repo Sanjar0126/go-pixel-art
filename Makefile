@@ -12,7 +12,7 @@ OUTPUT := $(BUILD_DIR)/$(BINARY)-$(GOOS)-$(GOARCH)$(EXT)
 BUILD_TARGETS := build-linux-amd64 build-linux-arm64 build-darwin-amd64 \
 	build-darwin-arm64 build-windows-amd64
 
-.PHONY: all build build-web web-palettes $(PALETTE_MANIFESTS) build-all build-linux-amd64 build-linux-arm64 \
+.PHONY: all build build-mcworld build-web web-palettes $(PALETTE_MANIFESTS) build-all build-linux-amd64 build-linux-arm64 \
 	build-darwin-amd64 build-darwin-arm64 build-windows-amd64 test clean
 
 all: build
@@ -20,6 +20,10 @@ all: build
 build:
 	mkdir -p $(BUILD_DIR)
 	GOOS=$(GOOS) GOARCH=$(GOARCH) $(GO) build -o $(OUTPUT) $(CMD)
+
+build-mcworld:
+	mkdir -p $(BUILD_DIR)
+	GOOS=$(GOOS) GOARCH=$(GOARCH) $(GO) build -o $(BUILD_DIR)/mcworld-$(GOOS)-$(GOARCH)$(EXT) ./cmd/mcworld
 
 build-web: web-palettes
 	mkdir -p $(WEB_DIR)
