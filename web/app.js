@@ -70,12 +70,31 @@ async function loadBundledPalette(manifest) {
     bundledPaletteManifest = manifest;
     bundledPalettePromise = fetch(manifest)
       .then((response) => response.json())
-      .then((paths) => Promise.all(paths.map(async (path) => {
+      .then((paths) => fetchWithConcurrencyLimit(paths, 24, async (path) => {
         const response = await fetch(path);
         return new Uint8Array(await response.arrayBuffer());
-      })));
+      }));
   }
   return bundledPalettePromise;
+}
+
+// Runs `task` over `items` with at most `limit` fetches in flight at once,
+// since firing thousands of concurrent requests (e.g. the full dota-icons
+// set) can exhaust the browser's connection pool (net::ERR_INSUFFICIENT_RESOURCES).
+async function fetchWithConcurrencyLimit(items, limit, task) {
+  const results = new Array(items.length);
+  let nextIndex = 0;
+
+  async function worker() {
+    while (nextIndex < items.length) {
+      const index = nextIndex++;
+      results[index] = await task(items[index]);
+    }
+  }
+
+  const workers = Array.from({ length: Math.min(limit, items.length) }, worker);
+  await Promise.all(workers);
+  return results;
 }
 
 processButton.addEventListener('click', async () => {
