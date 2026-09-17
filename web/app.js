@@ -9,12 +9,19 @@ const paletteInput = document.querySelector('#palette-input');
 const paletteName = document.querySelector('#palette-name');
 const mosaicInput = document.querySelector('#mosaic');
 const paletteSizeField = document.querySelector('#palette-size-field');
+const bundledPaletteSelect = document.querySelector('#bundled-palette');
 
 let selectedFile;
 let originalURL;
 let resultURL;
 let paletteFiles = [];
+let bundledPaletteManifest;
 let bundledPalettePromise;
+
+bundledPaletteSelect.addEventListener('change', () => {
+  bundledPaletteManifest = undefined;
+  bundledPalettePromise = undefined;
+});
 
 function updateOptionVisibility() {
   paletteSizeField.hidden = mosaicInput.checked;
@@ -58,9 +65,10 @@ paletteInput.addEventListener('change', () => {
 mosaicInput.addEventListener('change', updateOptionVisibility);
 updateOptionVisibility();
 
-async function loadBundledPalette() {
-  if (!bundledPalettePromise) {
-    bundledPalettePromise = fetch('palette.json')
+async function loadBundledPalette(manifest) {
+  if (bundledPaletteManifest !== manifest) {
+    bundledPaletteManifest = manifest;
+    bundledPalettePromise = fetch(manifest)
       .then((response) => response.json())
       .then((paths) => Promise.all(paths.map(async (path) => {
         const response = await fetch(path);
@@ -85,7 +93,7 @@ processButton.addEventListener('click', async () => {
     };
     let paletteSources = paletteFiles;
     if (options.mosaic && paletteSources.length === 0) {
-      paletteSources = await loadBundledPalette();
+      paletteSources = await loadBundledPalette(bundledPaletteSelect.value);
       paletteName.textContent = `${paletteSources.length} bundled tiles loaded`;
     }
     const paletteBytes = await Promise.all(paletteSources.map(async (file) => (

@@ -28,9 +28,15 @@
           <label id="palette-size-field">Palette size <span class="hint">Color palette limit in pixel mode</span><input id="palette-size" type="number" min="1" max="256" value="8"></label>
         </div>
         <label class="mode"> <input id="mosaic" type="checkbox"> Mosaic mode</label>
+        <label id="bundled-palette-field">Bundled palette <span class="hint">Used when no palette tiles are uploaded</span>
+          <select id="bundled-palette">
+            <option value="minecraft-icons.json">Minecraft icons</option>
+            <option value="dota-icons.json">Dota 2 icons</option>
+          </select>
+        </label>
         <label class="dropzone compact" for="palette-input">
           <span class="drop-title">Palette tiles</span>
-          <span id="palette-name">Bundled web/palette or upload files</span>
+          <span id="palette-name">Bundled palette or upload files</span>
           <input id="palette-input" type="file" accept="image/png,image/jpeg,image/webp,image/gif" multiple>
         </label>
         <button id="process" type="button" disabled>Process image</button>
